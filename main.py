@@ -2,50 +2,42 @@ import os
 import openai
 import streamlit as st
 from openai import OpenAI
-from dotenv import load_dotenv
 
-load_dotenv('.env')
+
 client = OpenAI(
-    # api_key=os.environ.get("OPENAI_API_KEY")
     api_key=st.secrets['OPENAI_API_KEY']
 )
 
-st.title('Ola, sou o seu instrutor digital')
-st.text('Pergunte-me alguma coisa sobre Sistemas Operacionais.')
+# Título
+st.title('KernelPedia - Enciclopédia Interativa de Sistemas Operacionais')
 
-st.write('Perguntas sugeridas:')
-with st.container(height=150):
-    col1, col2, col3, col4 = st.columns(4)
+# Descrição do propósito do site
+st.text('Bem-vindo ao KernelPedia, sua Enciclopédia Interativa de Sistemas Operacionais!\n'   
+        'Você pode fazer perguntas sobre sistemas operacionais e aprender mais sobre eles.')
 
-    with col1:
-        pergunta1 = st.button('O que são sistemas operacionais?')
-        if pergunta1:
-            st.session_state.input_text = 'O que são sistemas operacionais?'
+st.subheader('Perguntas sugeridas:')
 
-    with col2:
-        pergunta2 = st.button('O que é um sistema Unix?')
-        if pergunta2:
-            st.session_state.input_text = 'O que é um sistema Unix?'
+perguntas = [
+    "O que são sistemas operacionais?",
+    "O que é um sistema Unix?",
+    "O que são processos em um sistema operacional?",
+    "Qual é a relação entre processos e sistemas operacionais?"
+]
 
-    with col3:
-        pergunta3 = st.button('O que são processos de um Sistema Operacional?')
-        if pergunta3:
-            st.session_state.input_text = 'O que são processos de um Sistema Operacional?'
+# Layout das perguntas sugeridas
+col1, col2, col3, col4 = st.columns(4)
+for i, pergunta in enumerate(perguntas):
+    with eval(f'col{i % 4 + 1}'):
+        if st.button(pergunta):
+            st.session_state.input_text = pergunta
 
-    with col4:
-        pergunta4 = st.button('Qual a relação entre processos e Sistema Operacional?')
-        if pergunta4:
-            st.session_state.input_text = 'Qual a relação entre processos e Sistema Operacional?'
+# Campo de entrada para a pergunta do usuário
+input_text = st.text_input("Faça uma pergunta sobre sistemas operacionais:",
+                           value=st.session_state.input_text if 'input_text' in st.session_state else '')
 
-st.divider()
-
-input_text = st.text_input("Você:",
-                           value=st.session_state.input_text if 'input_text' in st.session_state else '',
-                           max_chars=None,
-                           key=None,
-                           type='default')
-
+# Botão para enviar a pergunta
 if st.button('Enviar'):
+    # Chamada à API do OpenAI para obter a resposta
     response = client.chat.completions.create(
         model="gpt-3.5-turbo-0125",
         messages=[
@@ -57,4 +49,7 @@ if st.button('Enviar'):
              }
         ]
     )
-    st.text_area("Chatbot:", value=response.choices[0].message.content, height=None, max_chars=None, key=None)
+    # Exibindo a resposta do chatbot
+    st.subheader("Resposta:")
+    st.text_area('resposta', response.choices[0].message.content, height=None, max_chars=None, key=None,
+                 label_visibility='hidden')
