@@ -4,10 +4,10 @@ import streamlit as st
 from openai import OpenAI
 from dotenv import load_dotenv
 
-
 load_dotenv('.env')
 client = OpenAI(
-  api_key=os.environ.get("OPENAI_API_KEY")
+    # api_key=os.environ.get("OPENAI_API_KEY")
+    api_key=st.secrets['OPENAI_API_KEY']
 )
 
 st.title('Ola, sou o seu instrutor digital')
@@ -50,10 +50,10 @@ if st.button('Enviar'):
         model="gpt-3.5-turbo-0125",
         messages=[
             {'role': 'system',
-             'content':"You are an experient university Information System's teacher. "
-              "You are skilled in explaining complex programming concepts and how did Operational Systems works! ",
-             'role':'user',
-             'content':f'{input_text}'
+             'content': "You are an experient university Information System's teacher. "
+                        "You are skilled in explaining complex programming concepts and how did Operational Systems works! ",
+             'role': 'user',
+             'content': f'{input_text}'
              }
         ]
     )
